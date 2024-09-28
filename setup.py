@@ -1,13 +1,16 @@
 import time
+import os
 import asyncio
 import polars as pl
 import aiosqlite
-from constants import TABLE_NAME, DB_PATH
+from constants import TABLE_NAME, DB_PATH, VALID_GAMES
 
 async def create_db():
-    async with aiosqlite.connect(DB_PATH) as conn:
-        await conn.execute(f'DROP TABLE IF EXISTS {TABLE_NAME};')
+    abs_path = os.path.abspath(DB_PATH)
+    if os.path.exists(abs_path):
+        os.remove(abs_path)
 
+    async with aiosqlite.connect(DB_PATH) as conn:
         print('Creating table...')
         start_time = time.time()
 
@@ -25,7 +28,7 @@ async def create_db():
 
 async def add_game(game: str):
     async with aiosqlite.connect(DB_PATH) as conn:
-        data = pl.read_csv(f'data/{game}.csv', separator=';').rows() 
+        data = pl.read_csv(f'data/{game}.csv', separator=',').rows() 
         
         print(f'Inserting new data for {game}...')
         start_time = time.time()
@@ -42,11 +45,9 @@ async def add_game(game: str):
         await conn.commit()
 
 async def main():
-    games = ['blades', 'eso']
-
     await create_db()
 
-    for game in games:
+    for game in VALID_GAMES:
         await add_game(game)
 
 if __name__ == "__main__":
