@@ -41,7 +41,7 @@ async def build_query(term, filters, games, is_count_query=False):
 
     return f"{base_query} ", params
 
-async def search_term(term: str, start=0, length=10, order_column="en", order_dir="ASC", games=[], filters=None):
+async def search_term(term: str, start=0, length=10, order_column=None, order_dir="ASC", games=[], filters=None):
     if filters is None:
         filters = [None, None, None]
 
@@ -49,7 +49,11 @@ async def search_term(term: str, start=0, length=10, order_column="en", order_di
         cursor = await conn.cursor()
 
         query, params = await build_query(term, filters, games)
-        query += f" ORDER BY {order_column} {order_dir} LIMIT ? OFFSET ?"
+
+        if order_column:
+            query += f" ORDER BY {order_column} {order_dir}"
+
+        query += " LIMIT ? OFFSET ?"
         params.extend([length, start])
 
         start_time = time.time()
