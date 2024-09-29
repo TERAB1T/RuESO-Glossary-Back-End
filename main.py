@@ -60,4 +60,3 @@ async def search(request: Request):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
-    print("test")
