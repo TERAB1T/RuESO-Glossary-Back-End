@@ -40,7 +40,7 @@ async def search(request: Request):
     column_2_filter = params.get("columns[2][search][value]")
 
     order_column = None
-    if order_column_index is not None:
+    if order_column_index is not None and order_column_index.isnumeric() and order_dir in ["ASC", "DESC"]:
         columns = ["game", "en", "ru"]
         order_column = columns[int(order_column_index)]
 
