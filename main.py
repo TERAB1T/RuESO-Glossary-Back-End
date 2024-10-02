@@ -1,12 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 import uvicorn
 from db.db_search import search_term
 from utils import prepare_html, validate_games
 
 app = FastAPI(docs_url=None, redoc_url=None)
-app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 origins = [
     "http://rueso.ru",
