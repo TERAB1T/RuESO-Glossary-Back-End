@@ -2,6 +2,7 @@ import re
 import time
 import aiosqlite
 from constants import DB_PATH, TABLE_NAME
+from utils import prepare_html
 
 def escape_query(query):
     escaped_query = query.replace('"', '""')
@@ -69,7 +70,12 @@ async def search_term(term: str, start=0, length=10, order_column=None, order_di
 
         return {
             "data": [
-                {"en": res[1], "game": res[0], "ru": res[2]} for res in results
+                {
+                    "game": res[0],
+                    "en": prepare_html(res[1]),
+                    "ru": prepare_html(res[2]),
+                    "tag": res[3]
+                } for res in results
             ],
             "recordsFiltered": total_records,
             "recordsTotal": total_records

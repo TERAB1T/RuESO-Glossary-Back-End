@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from db.db_search import search_term
-from utils import prepare_html, validate_games
+from utils import validate_games
 
 app = FastAPI(docs_url=None, redoc_url=None)
 
@@ -52,10 +52,7 @@ async def search(request: Request):
         "draw": draw,
         "recordsTotal": result["recordsTotal"],
         "recordsFiltered": result["recordsFiltered"],
-        "data": [
-            [row["game"], prepare_html(row["en"]), prepare_html(row["ru"])]
-            for row in result["data"]
-        ]
+        "data": result["data"]
     }
 
 if __name__ == "__main__":
