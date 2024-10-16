@@ -6,6 +6,7 @@ from utils import prepare_html
 
 def escape_query(query):
     escaped_query = query.replace('"', '""')
+    escaped_query = query.replace('’', '\'')
     return f'"{escaped_query}"'
 
 async def build_query(term, filters, games, is_count_query=False):
@@ -19,10 +20,6 @@ async def build_query(term, filters, games, is_count_query=False):
     else:
         query_conditions.append(f"{TABLE_NAME} MATCH ?")
         params.append(f'en:{escape_query(term)} OR ru:{escape_query(term)}')
-
-    if filters[0]:
-        query_conditions.append("game MATCH ?")
-        params.append(escape_query(filters[0]))
 
     if filters[1]:
         query_conditions.append("en MATCH ?")
