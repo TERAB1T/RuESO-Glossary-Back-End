@@ -5,7 +5,8 @@ from constants import DB_PATH, TABLE_NAME
 from utils import prepare_html
 
 def escape_query(query):
-    escaped_query = query.replace('"', '""').replace('’', '\'').replace(' ', ' ')
+    escaped_query = query.replace('"', '""').replace(' ', ' ')
+    escaped_query = re.sub(r'[‘’]', r'\'', escaped_query)
     escaped_query = re.sub(r'[“”„]', r'""', escaped_query)
     return f'"{escaped_query}"'
 
