@@ -6,8 +6,8 @@ from utils import prepare_html
 
 def escape_query(query):
     escaped_query = query.replace('"', '""').replace(' ', ' ')
-    escaped_query = re.sub(r'[‘’]', r'\'', escaped_query)
-    escaped_query = re.sub(r'[“”„]', r'""', escaped_query)
+    escaped_query = re.sub(r'[‘’]', '\'', escaped_query)
+    escaped_query = re.sub(r'[“”„]', '""', escaped_query)
     return f'"{escaped_query}"'
 
 async def build_query(term, filters, games, is_count_query=False):
