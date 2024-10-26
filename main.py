@@ -38,14 +38,15 @@ async def search(request: Request):
     column_0_filter = params.get("columns[0][search][value]")
     column_1_filter = params.get("columns[1][search][value]")
     column_2_filter = params.get("columns[2][search][value]")
+    column_3_filter = params.get("columns[3][search][value]")
 
     order_column = None
     if order_column_index is not None and order_column_index.isnumeric() and order_dir in ["ASC", "DESC"]:
-        columns = ["game", "en", "ru"]
+        columns = ["game", "type", "en", "ru"]
         order_column = columns[int(order_column_index)]
 
     result = await search_term(
-        search_value, start=start, length=length, order_column=order_column, order_dir=order_dir, games=validate_games(games), filters=[column_0_filter, column_1_filter, column_2_filter]
+        search_value, start=start, length=length, order_column=order_column, order_dir=order_dir, games=validate_games(games), filters=[column_0_filter, column_1_filter, column_2_filter, column_3_filter]
     )
 
     return {

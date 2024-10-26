@@ -19,6 +19,7 @@ async def create_db():
                 game,
                 en,
                 ru,
+                type,
                 tag,
                 tokenize="trigram"
             )
@@ -35,8 +36,8 @@ async def add_game(game: str):
         start_time = time.time()
 
         await conn.executemany(
-            f'''INSERT INTO {TABLE_NAME} (game, en, ru, tag)
-            VALUES (?, ?, ?, ?)''',
+            f'''INSERT INTO {TABLE_NAME} (game, en, ru, type, tag)
+            VALUES (?, ?, ?, ?, ?)''',
             data
         )
 

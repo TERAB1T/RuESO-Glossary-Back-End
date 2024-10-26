@@ -23,12 +23,16 @@ async def build_query(term, filters, games, is_count_query=False):
         params.append(f'en:{escape_query(term)} OR ru:{escape_query(term)}')
 
     if filters[1]:
-        query_conditions.append("en MATCH ?")
+        query_conditions.append("type MATCH ?")
         params.append(escape_query(filters[1]))
 
     if filters[2]:
-        query_conditions.append("ru MATCH ?")
+        query_conditions.append("en MATCH ?")
         params.append(escape_query(filters[2]))
+
+    if filters[3]:
+        query_conditions.append("ru MATCH ?")
+        params.append(escape_query(filters[3]))
 
     if games:
         placeholders = ', '.join('?' for _ in games)
@@ -42,7 +46,7 @@ async def build_query(term, filters, games, is_count_query=False):
 
 async def search_term(term: str, start=0, length=10, order_column=None, order_dir="ASC", games=[], filters=None):
     if filters is None:
-        filters = [None, None, None]
+        filters = [None, None, None, None]
 
     async with aiosqlite.connect(DB_PATH) as conn:
         cursor = await conn.cursor()
@@ -72,7 +76,8 @@ async def search_term(term: str, start=0, length=10, order_column=None, order_di
                     "game": res[0],
                     "en": prepare_html(res[1]),
                     "ru": prepare_html(res[2]),
-                    "tag": res[3]
+                    "type": res[3],
+                    "tag": res[4]
                 } for res in results
             ],
             "recordsFiltered": total_records,
