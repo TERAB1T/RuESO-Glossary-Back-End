@@ -6,9 +6,8 @@ import aiosqlite
 from constants import TABLE_NAME, DB_PATH, VALID_GAMES
 
 async def create_db():
-    abs_path = os.path.abspath(DB_PATH)
-    if os.path.exists(abs_path):
-        os.remove(abs_path)
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
 
     async with aiosqlite.connect(DB_PATH) as conn:
         print('Creating table...')
