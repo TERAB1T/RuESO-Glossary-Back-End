@@ -29,7 +29,8 @@ async def create_db():
 
 async def add_game(game: str):
     async with aiosqlite.connect(DB_PATH) as conn:
-        data = pl.read_csv(f'data/{game}.csv', separator=',').rows() 
+        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'data/{game}.csv')
+        data = pl.read_csv(data_path, separator=',').rows() 
         
         print(f'Inserting new data for {game}...')
         start_time = time.time()
