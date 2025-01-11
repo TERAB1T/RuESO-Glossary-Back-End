@@ -35,9 +35,8 @@ async def build_query(term, filters, games, is_count_query=False):
         params.append(escape_query(filters[3]))
 
     if games:
-        placeholders = ', '.join('?' for _ in games)
-        query_conditions.append(f"game IN ({placeholders})")
-        params.extend(games)
+        query_conditions.append(f"{TABLE_NAME} MATCH ?")
+        params.append(" OR ".join([f"game:^{game}" for game in games]))
 
     if query_conditions:
         base_query += " WHERE " + " AND ".join(query_conditions)
@@ -62,13 +61,19 @@ async def search_term(term: str, start=0, length=10, order_column=None, order_di
         start_time = time.time()
         await cursor.execute(query, params)
         results = await cursor.fetchall()
+        
         execution_time = time.time() - start_time
-        print(f"Execution time: {execution_time:.6f} seconds")
+        print(f"Execution time 1: {execution_time:.6f} seconds")
+
+        start_time = time.time()
 
         count_query, count_params = await build_query(term, filters, games, is_count_query=True)
         await cursor.execute(count_query, count_params)
         total_records = await cursor.fetchone()
         total_records = total_records[0] if total_records else 0
+        
+        execution_time = time.time() - start_time
+        print(f"Execution time 2: {execution_time:.6f} seconds")
 
         return {
             "data": [

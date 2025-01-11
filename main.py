@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from db.db_search import search_term
 from utils import validate_games
+import time
 
 app = FastAPI(docs_url=None, redoc_url=None)
 
@@ -12,6 +13,14 @@ origins = [
     "http://127.0.0.1",
     "http://127.0.0.1:5500",
 ]
+
+@app.middleware("http")
+async def log_time(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    print(f"Request took {process_time:.4f} seconds")
+    return response
 
 app.add_middleware(
     CORSMiddleware,
