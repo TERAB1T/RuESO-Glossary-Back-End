@@ -1,6 +1,5 @@
 from time import time
 import html
-from constants import VALID_GAMES
 
 def timer_func(func: callable):
     def wrap_func(*args, **kwargs):
@@ -19,6 +18,3 @@ def prepare_html(string: str) -> str:
         string = html.escape(string).replace('\n', '<br>')
 
     return string
-
-def validate_games(games: list) -> list:
-    return list(set(games).intersection(VALID_GAMES))
