@@ -1,5 +1,6 @@
 from time import time
 import html
+import re
 
 def timer_func(func: callable):
     def wrap_func(*args, **kwargs):
@@ -18,3 +19,19 @@ def prepare_html(string: str) -> str:
         string = html.escape(string).replace('\n', '<br>')
 
     return string
+
+def is_integer(value) -> bool:
+    if isinstance(value, int):
+        return value > 0
+    
+    if isinstance(value, str) and value.isdigit():
+        return int(value) > 0
+    
+    return False
+
+def parse_ids(ids) -> list:
+    if isinstance(ids, str):
+        if re.fullmatch(r"[\d,]+", ids):
+            return [x for x in ids.split(',') if x]
+
+    return []
