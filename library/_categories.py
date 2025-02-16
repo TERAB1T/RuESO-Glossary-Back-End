@@ -1,3 +1,4 @@
+import math
 import aiosqlite
 from .constants import DB_PATH, TABLE_NAME_BOOKS, TABLE_NAME_CATEGORIES
 
@@ -57,7 +58,7 @@ class Categories:
                     "page": page,
                     "page_size": page_size,
                     "total_books": total_books,
-                    "total_pages": (total_books + page_size - 1) // page_size
+                    "total_pages": math.ceil(total_books / page_size)
                 }
 
             return category
