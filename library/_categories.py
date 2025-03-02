@@ -39,7 +39,7 @@ class Categories:
                                  SELECT id, titleEn, titleRu, icon, slug
                                  FROM {TABLE_NAME_BOOKS}
                                  WHERE catId = ?
-                                 ORDER BY titleRu ASC
+                                 ORDER BY orderId ASC
                                  LIMIT ? OFFSET ?
                                  ''', (category_id, page_size, offset))
             

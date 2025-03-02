@@ -13,7 +13,7 @@ class Books:
             conn.row_factory = aiosqlite.Row
             cursor = await conn.cursor()
 
-            await cursor.execute(f"SELECT id, titleEn, titleRu, icon, slug FROM {TABLE_NAME_BOOKS} ORDER BY titleRu ASC LIMIT ? OFFSET ?", (page_size, offset))
+            await cursor.execute(f"SELECT id, titleEn, titleRu, icon, slug FROM {TABLE_NAME_BOOKS} ORDER BY orderId ASC LIMIT ? OFFSET ?", (page_size, offset))
             books = await cursor.fetchall()
             books = [dict(book) for book in books]
 
@@ -35,7 +35,7 @@ class Books:
             conn.row_factory = aiosqlite.Row
             cursor = await conn.cursor()
 
-            await cursor.execute(f"SELECT id, titleEn, titleRu, icon, slug FROM {TABLE_NAME_BOOKS} WHERE id IN ({','.join(['?'] * len(ids))}) ORDER BY titleRu ASC", ids)
+            await cursor.execute(f"SELECT id, titleEn, titleRu, icon, slug FROM {TABLE_NAME_BOOKS} WHERE id IN ({','.join(['?'] * len(ids))}) ORDER BY orderId ASC", ids)
             books = await cursor.fetchall()
             
             return [dict(book) for book in books]
