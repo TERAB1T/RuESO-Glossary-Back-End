@@ -9,23 +9,23 @@ async def create_db():
     creation_query = f'''
     CREATE TABLE IF NOT EXISTS {TABLE_NAME_CATEGORIES} (
         id INTEGER PRIMARY KEY,
-        titleEn TEXT NOT NULL,
+        titleEn TEXT,
         titleRu TEXT,
         descEn TEXT,
         descRu TEXT,
         icon TEXT,
-        slug TEXT UNIQUE NOT NULL
+        slug TEXT
     ) WITHOUT ROWID;
 
     CREATE TABLE IF NOT EXISTS {TABLE_NAME_BOOKS} (
         id INTEGER PRIMARY KEY,
-        titleEn TEXT NOT NULL,
+        titleEn TEXT,
         titleRu TEXT,
         textEn TEXT,
         textRu TEXT,
-        icon TEXT NOT NULL,
+        icon TEXT,
         catId INTEGER NOT NULL,
-        slug TEXT NOT NULL,
+        slug TEXT,
         orderId INTEGER NOT NULL,
         FOREIGN KEY (catId) REFERENCES {TABLE_NAME_CATEGORIES} (id)
     ) WITHOUT ROWID;
