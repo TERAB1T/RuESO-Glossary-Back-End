@@ -6,8 +6,11 @@ import aiosqlite
 from constants import DB_PATH, TABLE_NAME_BOOKS, TABLE_NAME_CATEGORIES
 
 async def create_db():
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+
     creation_query = f'''
-    CREATE TABLE IF NOT EXISTS {TABLE_NAME_CATEGORIES} (
+    CREATE TABLE {TABLE_NAME_CATEGORIES} (
         id INTEGER PRIMARY KEY,
         titleEn TEXT,
         titleRu TEXT,
@@ -17,8 +20,8 @@ async def create_db():
         slug TEXT
     ) WITHOUT ROWID;
 
-    CREATE TABLE IF NOT EXISTS {TABLE_NAME_BOOKS} (
-        id INTEGER PRIMARY KEY,
+    CREATE TABLE {TABLE_NAME_BOOKS} (
+        id INTEGER NOT NULL,
         titleEn TEXT,
         titleRu TEXT,
         textEn TEXT,
@@ -26,14 +29,14 @@ async def create_db():
         icon TEXT,
         catId INTEGER NOT NULL,
         slug TEXT,
-        orderId INTEGER NOT NULL,
+        created TEXT,
+        updated TEXT,
+        orderId INTEGER NOT NULL PRIMARY KEY,
         FOREIGN KEY (catId) REFERENCES {TABLE_NAME_CATEGORIES} (id)
     ) WITHOUT ROWID;
 
-    CREATE INDEX IF NOT EXISTS idx_categories_id ON {TABLE_NAME_CATEGORIES} (id);
-    CREATE INDEX IF NOT EXISTS idx_books_id ON {TABLE_NAME_BOOKS} (id);
-    CREATE INDEX IF NOT EXISTS idx_books_catId ON {TABLE_NAME_BOOKS} (catId);
-    CREATE INDEX IF NOT EXISTS idx_books_orderId ON {TABLE_NAME_BOOKS} (orderId);
+    CREATE INDEX idx_books_id ON {TABLE_NAME_BOOKS} (id);
+    CREATE INDEX idx_books_catId_order ON {TABLE_NAME_BOOKS} (catId, orderId);
     '''
 
     async with aiosqlite.connect(DB_PATH) as conn:
@@ -57,12 +60,6 @@ async def populate_db():
         await conn.executemany(
             f'''INSERT INTO {TABLE_NAME_CATEGORIES} (id, titleEn, titleRu, descEn, descRu, icon, slug)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET
-                    titleEn=excluded.titleEn,
-                    titleRu=excluded.titleRu,
-                    descEn=excluded.descEn,
-                    descRu=excluded.descRu,
-                    icon=excluded.icon;
             ''',
             categories_csv
         )
@@ -74,16 +71,8 @@ async def populate_db():
         start_time = time.time()
 
         await conn.executemany(
-            f'''INSERT INTO {TABLE_NAME_BOOKS} (id, titleEn, titleRu, textEn, textRu, icon, catId, slug, orderId)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET
-                    titleEn=excluded.titleEn,
-                    titleRu=excluded.titleRu,
-                    textEn=excluded.textEn,
-                    textRu=excluded.textRu,
-                    icon=excluded.icon,
-                    catId=excluded.catId,
-                    orderId=excluded.orderId;
+            f'''INSERT INTO {TABLE_NAME_BOOKS} (id, titleEn, titleRu, textEn, textRu, icon, catId, slug, created, updated, orderId)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''',
             books_csv
         )
