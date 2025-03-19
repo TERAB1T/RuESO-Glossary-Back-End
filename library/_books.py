@@ -17,7 +17,7 @@ class Books:
             books = await cursor.fetchall()
             books = [dict(book) for book in books]
 
-            await cursor.execute(f"SELECT COUNT(*) FROM {TABLE_NAME_BOOKS}")
+            await cursor.execute(f"SELECT COUNT(*) FROM {TABLE_NAME_BOOKS} WHERE catId != 2000")
             total_books = (await cursor.fetchone())[0]
 
             return {
