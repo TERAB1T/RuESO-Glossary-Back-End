@@ -1,1 +1,1 @@
-# RuESO Glossary (Back-End)
+# RuESO Glossary (Back-End — FastAPI)
