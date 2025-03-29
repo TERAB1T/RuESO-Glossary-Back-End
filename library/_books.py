@@ -1,6 +1,6 @@
 import math
 import aiosqlite
-from .constants import DB_PATH, TABLE_NAME_BOOKS, TABLE_NAME_CATEGORIES
+from .constants import DB_PATH, TABLE_NAME_BOOKS, TABLE_NAME_CATEGORIES, TABLE_NAME_PATCHES
 
 class Books:
     def __init__(self):
@@ -53,8 +53,31 @@ class Books:
             
             book = dict(book)
 
+
+            isSameVersion = book["created"] == book["updated"]
+
+
             await cursor.execute(f"SELECT id, titleEn, titleRu, icon, slug FROM {TABLE_NAME_CATEGORIES} WHERE id = ?", (book["catId"],))
             category = await cursor.fetchone()
 
             book["category"] = dict(category) if category else {}
+
+
+            await cursor.execute(f"SELECT version, nameEn, nameRu, date, slug FROM {TABLE_NAME_PATCHES} WHERE version = ?", (book["created"],))
+            created = await cursor.fetchone()
+
+            book["created"] = dict(created) if created else {}
+
+
+            if isSameVersion:
+                book["updated"] = book["created"]
+                return book
+            
+
+            await cursor.execute(f"SELECT version, nameEn, nameRu, date, slug FROM {TABLE_NAME_PATCHES} WHERE version = ?", (book["updated"],))
+            updated = await cursor.fetchone()
+
+            book["updated"] = dict(updated) if updated else {}
+
+
             return book

@@ -3,7 +3,7 @@ import os
 import asyncio
 import polars as pl
 import aiosqlite
-from constants import DB_PATH, TABLE_NAME_BOOKS, TABLE_NAME_CATEGORIES
+from constants import DB_PATH, TABLE_NAME_BOOKS, TABLE_NAME_CATEGORIES, TABLE_NAME_PATCHES
 
 async def create_db():
     if os.path.exists(DB_PATH):
@@ -19,6 +19,18 @@ async def create_db():
         icon TEXT,
         slug TEXT
     ) WITHOUT ROWID;
+
+    CREATE TABLE {TABLE_NAME_PATCHES} (
+        id INTEGER PRIMARY KEY,
+        version TEXT,
+        nameEn TEXT,
+        nameRu TEXT,
+        image TEXT,
+        date TEXT,
+        slug TEXT
+    ) WITHOUT ROWID;
+
+    CREATE INDEX idx_patches_version ON {TABLE_NAME_PATCHES} (version);
 
     CREATE TABLE {TABLE_NAME_BOOKS} (
         id INTEGER NOT NULL,
@@ -47,6 +59,9 @@ async def create_db():
 async def populate_db():
     categories_csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/categories.csv')
     categories_csv = pl.read_csv(categories_csv_path, separator=',').rows()
+
+    patches_csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/patches.csv')
+    patches_csv = pl.read_csv(patches_csv_path, separator=',').rows()
     
     books_csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/books.csv')
     books_csv = pl.read_csv(books_csv_path, separator=',').rows()
@@ -66,6 +81,21 @@ async def populate_db():
 
         execution_time = time.time() - start_time
         print(f"Categories inserted: {execution_time:.6f} seconds")
+
+
+        print('Inserting new patches...')
+        start_time = time.time()
+
+        await conn.executemany(
+            f'''INSERT INTO {TABLE_NAME_PATCHES} (id, version, nameEn, nameRu, image, date, slug)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''',
+            patches_csv
+        )
+
+        execution_time = time.time() - start_time
+        print(f"Patches inserted: {execution_time:.6f} seconds")
+
 
         print('Inserting new books...')
         start_time = time.time()
