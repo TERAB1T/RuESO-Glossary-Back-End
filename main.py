@@ -6,6 +6,7 @@ from utils import is_integer, parse_ids
 
 from glossary._search import GlossarySearch
 from library._categories import Categories
+from library._patches import Patches
 from library._books import Books
 
 app = FastAPI(docs_url=None, redoc_url=None)
@@ -67,6 +68,30 @@ async def api_category(request: Request):
         return await categories.get_category(
             int(category_id), int(page), int(page_size)
         )
+
+
+@app.get("/library/patches")
+async def api_patches(request: Request):
+    patches = Patches()
+    return await patches.get_patches()
+
+
+@app.get("/library/patches/{patch_version}")
+async def api_patch(request: Request):
+    patches = Patches()
+
+    patch_version = request.path_params["patch_version"]
+    page = request.query_params.get("page")
+    page_size = request.query_params.get("page_size")
+
+    if not is_integer(page):
+        page = 1
+    if not is_integer(page_size):
+        page_size = 50
+
+    return await patches.get_patch(
+        patch_version, int(page), int(page_size)
+    )
 
 
 @app.get("/library/books")
