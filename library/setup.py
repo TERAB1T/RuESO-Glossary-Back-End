@@ -49,6 +49,8 @@ async def create_db():
 
     CREATE INDEX idx_books_id ON {TABLE_NAME_BOOKS} (id);
     CREATE INDEX idx_books_catId_order ON {TABLE_NAME_BOOKS} (catId, orderId);
+
+    CREATE VIRTUAL TABLE {TABLE_NAME_BOOKS}_fts USING fts5(id, titleEn, titleRu, tokenize="trigram");
     '''
 
     async with aiosqlite.connect(DB_PATH) as conn:
@@ -105,6 +107,12 @@ async def populate_db():
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''',
             books_csv
+        )
+
+        await conn.execute(
+            f'''INSERT INTO {TABLE_NAME_BOOKS}_fts (id, titleEn, titleRu)
+                SELECT id, titleEn, titleRu FROM {TABLE_NAME_BOOKS};
+            '''
         )
 
         execution_time = time.time() - start_time
