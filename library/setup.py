@@ -11,14 +11,18 @@ async def create_db():
 
     creation_query = f'''
     CREATE TABLE {TABLE_NAME_CATEGORIES} (
-        id INTEGER PRIMARY KEY,
+        id INTEGER NOT NULL,
         titleEn TEXT,
         titleRu TEXT,
         descEn TEXT,
         descRu TEXT,
         icon TEXT,
-        slug TEXT
+        slug TEXT,
+        orderId INTEGER NOT NULL PRIMARY KEY
     ) WITHOUT ROWID;
+
+    CREATE INDEX idx_categories_id ON {TABLE_NAME_CATEGORIES} (id);
+    CREATE INDEX idx_categories_id_orderId ON {TABLE_NAME_CATEGORIES} (id, orderId);
 
     CREATE TABLE {TABLE_NAME_PATCHES} (
         id INTEGER PRIMARY KEY,
@@ -43,12 +47,17 @@ async def create_db():
         slug TEXT,
         created TEXT,
         updated TEXT,
+        groupIds TEXT,
         orderId INTEGER NOT NULL PRIMARY KEY,
+        orderCatId INTEGER NOT NULL,
         FOREIGN KEY (catId) REFERENCES {TABLE_NAME_CATEGORIES} (id)
     ) WITHOUT ROWID;
 
     CREATE INDEX idx_books_id ON {TABLE_NAME_BOOKS} (id);
-    CREATE INDEX idx_books_catId_order ON {TABLE_NAME_BOOKS} (catId, orderId);
+    CREATE INDEX idx_books_orderCatId ON {TABLE_NAME_BOOKS} (orderCatId);
+    CREATE INDEX idx_books_catId_orderId ON {TABLE_NAME_BOOKS} (catId, orderId);
+    CREATE INDEX idx_books_created_orderId ON {TABLE_NAME_BOOKS} (created, orderId);
+    CREATE INDEX idx_books_created_orderCatId ON {TABLE_NAME_BOOKS} (created, orderCatId);
 
     CREATE VIRTUAL TABLE {TABLE_NAME_BOOKS}_fts USING fts5(id, titleEn, titleRu, tokenize="trigram");
     '''
@@ -75,8 +84,8 @@ async def populate_db():
         start_time = time.time()
 
         await conn.executemany(
-            f'''INSERT INTO {TABLE_NAME_CATEGORIES} (id, titleEn, titleRu, descEn, descRu, icon, slug)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+            f'''INSERT INTO {TABLE_NAME_CATEGORIES} (id, titleEn, titleRu, descEn, descRu, icon, slug, orderId)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''',
             categories_csv
         )
@@ -103,8 +112,8 @@ async def populate_db():
         start_time = time.time()
 
         await conn.executemany(
-            f'''INSERT INTO {TABLE_NAME_BOOKS} (id, titleEn, titleRu, textEn, textRu, icon, catId, slug, created, updated, orderId)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            f'''INSERT INTO {TABLE_NAME_BOOKS} (id, titleEn, titleRu, textEn, textRu, icon, catId, slug, created, updated, groupIds, orderId, orderCatId)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''',
             books_csv
         )
