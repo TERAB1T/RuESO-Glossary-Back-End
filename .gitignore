@@ -5,5 +5,8 @@ __pycache__/
 *.csv
 *.db
 *.xml
+*.epub
+*.fb2
 
 .vscode/
+library/data/eso-library/
