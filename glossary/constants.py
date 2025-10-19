@@ -9,4 +9,4 @@ FALLOUT_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), FALLO
 TABLE_NAME = 'glossary'
 COLUMNS = ['game', 'type', 'en', 'ru']
 TES_VALID_GAMES = ['eso', 'skyrim', 'oblivion', 'morrowind', 'legends', 'blades', 'castles', 'redguard', 'battlespire', 'travels', 'arena', 'daggerfall']
-FALLOUT_VALID_GAMES = ['fallout 3', 'new vegas', 'fallout 4', 'shelter', 'fallout 76']
+FALLOUT_VALID_GAMES = ['tactics', 'fallout 3', 'new vegas', 'fallout 4', 'shelter', 'fallout 76']
